@@ -15,7 +15,7 @@ export const AuthProvider = ({ children }) => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
         // Get user role from our data
-        const users = getUsers();
+        const users = await getUsers();
         const userData = users.find(u => u.email === user.email);
         setCurrentUser({ ...user, role: userData?.role || 'user' });
       } else {

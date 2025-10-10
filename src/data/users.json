@@ -6,7 +6,8 @@
     "role": "admin",
     "blocked": false,
     "badges": ["verified"],
-    "points": 100
+    "points": 100,
+    "password": "adminpass"
   },
   {
     "id": "2",
@@ -21,10 +22,11 @@
     "id": "3",
     "email": "user2@example.com",
     "name": "Jane Smith",
-    "role": "user",
+    "role": "admin",
     "blocked": false,
     "badges": ["top-provider"],
-    "points": 200
+    "points": 200,
+    "password": "janepass"
   },
   {
     "id": "4",

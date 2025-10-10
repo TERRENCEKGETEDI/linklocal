@@ -17,15 +17,20 @@ const RequestService = () => {
     budget: ''
   });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    addServiceRequest({
-      ...form,
-      userId: currentUser.uid,
-      status: 'pending'
-    });
-    toast.success('Service request submitted!');
-    navigate('/');
+    try {
+      await addServiceRequest({
+        ...form,
+        userId: currentUser.uid,
+        status: 'pending'
+      });
+      toast.success('Service request submitted!');
+      navigate('/');
+    } catch (error) {
+      toast.error('Failed to submit service request');
+      console.error('Error submitting service request:', error);
+    }
   };
 
   const handleChange = (e) => {

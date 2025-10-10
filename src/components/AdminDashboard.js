@@ -18,12 +18,24 @@ const AdminDashboard = () => {
   const [userForm, setUserForm] = useState({ name: '', email: '', role: 'user', blocked: false, badges: [], points: 0 });
 
   useEffect(() => {
-    setUsers(getUsers());
-    setPosts(getPosts());
-    setToolRequests(getToolRequests());
-    setFilteredUsers(getUsers());
-    setFilteredPosts(getPosts());
-    setFilteredRequests(getToolRequests());
+    const loadData = async () => {
+      try {
+        const usersData = await getUsers();
+        const postsData = await getPosts();
+        const toolRequestsData = await getToolRequests();
+
+        setUsers(usersData);
+        setPosts(postsData);
+        setToolRequests(toolRequestsData);
+        setFilteredUsers(usersData);
+        setFilteredPosts(postsData);
+        setFilteredRequests(toolRequestsData);
+      } catch (error) {
+        console.error('Error loading admin data:', error);
+        toast.error('Failed to load admin data');
+      }
+    };
+    loadData();
   }, []);
 
   useEffect(() => {
@@ -32,70 +44,133 @@ const AdminDashboard = () => {
     setFilteredRequests(toolRequests.filter(r => r.toolName.toLowerCase().includes(searchTerm.toLowerCase())));
   }, [searchTerm, users, posts, toolRequests]);
 
-  const handleUserSubmit = () => {
-    if (editingUser) {
-      updateUser(editingUser.id, userForm);
-      setUsers(getUsers());
-      toast.success('User updated!');
-    } else {
-      // Add new user logic, but since Firebase, perhaps not
-      toast.info('Adding new users should be done via Firebase Auth');
+  const handleUserSubmit = async () => {
+    try {
+      if (editingUser) {
+        await updateUser(editingUser.id, userForm);
+        const usersData = await getUsers();
+        setUsers(usersData);
+        setFilteredUsers(usersData);
+        toast.success('User updated!');
+      } else {
+        // Add new user logic, but since Firebase, perhaps not
+        toast.info('Adding new users should be done via Firebase Auth');
+      }
+      setOpenUserDialog(false);
+      setEditingUser(null);
+      setUserForm({ name: '', email: '', role: 'user', blocked: false, badges: [], points: 0 });
+    } catch (error) {
+      toast.error('Failed to save user');
+      console.error('Error saving user:', error);
     }
-    setOpenUserDialog(false);
-    setEditingUser(null);
-    setUserForm({ name: '', email: '', role: 'user', blocked: false, badges: [], points: 0 });
   };
 
-  const handleBlockUser = (id) => {
-    const user = users.find(u => u.id === id);
-    updateUser(id, { blocked: !user.blocked });
-    setUsers(getUsers());
-    toast.success(user.blocked ? 'User unblocked!' : 'User blocked!');
+  const handleBlockUser = async (id) => {
+    try {
+      const user = users.find(u => u.id === id);
+      await updateUser(id, { blocked: !user.blocked });
+      const usersData = await getUsers();
+      setUsers(usersData);
+      setFilteredUsers(usersData);
+      toast.success(user.blocked ? 'User unblocked!' : 'User blocked!');
+    } catch (error) {
+      toast.error('Failed to update user status');
+      console.error('Error updating user status:', error);
+    }
   };
 
-  const handleDeleteUser = (id) => {
-    deleteUser(id);
-    setUsers(getUsers());
-    toast.success('User deleted!');
+  const handleDeleteUser = async (id) => {
+    try {
+      await deleteUser(id);
+      const usersData = await getUsers();
+      setUsers(usersData);
+      setFilteredUsers(usersData);
+      toast.success('User deleted!');
+    } catch (error) {
+      toast.error('Failed to delete user');
+      console.error('Error deleting user:', error);
+    }
   };
 
-  const handleDeletePost = (id) => {
-    deletePost(id);
-    setPosts(getPosts());
-    toast.success('Post deleted!');
+  const handleDeletePost = async (id) => {
+    try {
+      await deletePost(id);
+      const postsData = await getPosts();
+      setPosts(postsData);
+      setFilteredPosts(postsData);
+      toast.success('Post deleted!');
+    } catch (error) {
+      toast.error('Failed to delete post');
+      console.error('Error deleting post:', error);
+    }
   };
 
-  const handleRepost = (id) => {
-    updatePost(id, { deleted: false });
-    setPosts(getPosts());
-    toast.success('Post reposted!');
+  const handleRepost = async (id) => {
+    try {
+      await updatePost(id, { deleted: false });
+      const postsData = await getPosts();
+      setPosts(postsData);
+      setFilteredPosts(postsData);
+      toast.success('Post reposted!');
+    } catch (error) {
+      toast.error('Failed to repost');
+      console.error('Error reposting:', error);
+    }
   };
 
-  const handleApproveRequest = (id) => {
-    updateToolRequest(id, { status: 'approved' });
-    setToolRequests(getToolRequests());
-    toast.success('Request approved!');
+  const handleApproveRequest = async (id) => {
+    try {
+      await updateToolRequest(id, { status: 'approved' });
+      const toolRequestsData = await getToolRequests();
+      setToolRequests(toolRequestsData);
+      setFilteredRequests(toolRequestsData);
+      toast.success('Request approved!');
+    } catch (error) {
+      toast.error('Failed to approve request');
+      console.error('Error approving request:', error);
+    }
   };
 
-  const handleDenyRequest = (id) => {
-    updateToolRequest(id, { status: 'denied' });
-    setToolRequests(getToolRequests());
-    toast.success('Request denied!');
+  const handleDenyRequest = async (id) => {
+    try {
+      await updateToolRequest(id, { status: 'denied' });
+      const toolRequestsData = await getToolRequests();
+      setToolRequests(toolRequestsData);
+      setFilteredRequests(toolRequestsData);
+      toast.success('Request denied!');
+    } catch (error) {
+      toast.error('Failed to deny request');
+      console.error('Error denying request:', error);
+    }
   };
 
-  const handleAssignBadge = (userId, badge) => {
-    const user = users.find(u => u.id === userId);
-    const newBadges = user.badges.includes(badge) ? user.badges.filter(b => b !== badge) : [...user.badges, badge];
-    updateUser(userId, { badges: newBadges });
-    setUsers(getUsers());
-    toast.success('Badge assigned!');
+  const handleAssignBadge = async (userId, badge) => {
+    try {
+      const user = users.find(u => u.id === userId);
+      const newBadges = user.badges.includes(badge) ? user.badges.filter(b => b !== badge) : [...user.badges, badge];
+      await updateUser(userId, { badges: newBadges });
+      const usersData = await getUsers();
+      setUsers(usersData);
+      setFilteredUsers(usersData);
+      toast.success('Badge assigned!');
+    } catch (error) {
+      toast.error('Failed to assign badge');
+      console.error('Error assigning badge:', error);
+    }
   };
 
-  const handleGiveReward = (userId, points) => {
-    const user = users.find(u => u.id === userId);
-    updateUser(userId, { points: user.points + points });
-    setUsers(getUsers());
-    toast.success('Reward given!');
+  const handleGiveReward = async (userId, points) => {
+    try {
+      const user = users.find(u => u.id === userId);
+      await updateUser(userId, { points: user.points + points });
+      const usersData = await getUsers();
+      setUsers(usersData);
+      setFilteredUsers(usersData);
+      toast.success('Reward given!');
+    } catch (error) {
+      toast.error('Failed to give reward');
+      console.error('Error giving reward:', error);
+    }
   };
 
   return (
