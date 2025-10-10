@@ -1,0 +1,12 @@
+[
+  {
+    "id": "1",
+    "userId": "1",
+    "serviceType": "Cleaning",
+    "description": "Need house cleaning service for a 3-bedroom apartment.",
+    "location": "Johannesburg",
+    "budget": "500",
+    "status": "pending",
+    "submittedAt": "2023-10-01T00:00:00Z"
+  }
+]
