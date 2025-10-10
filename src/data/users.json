@@ -1,0 +1,49 @@
+[
+  {
+    "id": "1",
+    "email": "admin@example.com",
+    "name": "Admin User",
+    "role": "admin",
+    "blocked": false,
+    "badges": ["verified"],
+    "points": 100
+  },
+  {
+    "id": "2",
+    "email": "user1@example.com",
+    "name": "John Doe",
+    "role": "user",
+    "blocked": false,
+    "badges": [],
+    "points": 50
+  },
+  {
+    "id": "3",
+    "email": "user2@example.com",
+    "name": "Jane Smith",
+    "role": "user",
+    "blocked": false,
+    "badges": ["top-provider"],
+    "points": 200
+  },
+  {
+    "id": "4",
+    "email": "user3@example.com",
+    "name": "Alice Johnson",
+    "role": "user",
+    "blocked": false,
+    "badges": ["helpful"],
+    "points": 75,
+    "password": "alicepass"
+  },
+  {
+    "id": "5",
+    "email": "user4@example.com",
+    "name": "Bob Wilson",
+    "role": "user",
+    "blocked": false,
+    "badges": [],
+    "points": 30,
+    "password": "bobpass"
+  }
+]

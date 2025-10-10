@@ -1,0 +1,18 @@
+[
+  {
+    "id": "1",
+    "userId": "2",
+    "toolName": "Power Drill",
+    "description": "Need a cordless power drill for a weekend project.",
+    "status": "pending",
+    "submittedAt": "2023-10-03T00:00:00Z"
+  },
+  {
+    "id": "2",
+    "userId": "3",
+    "toolName": "Ladder",
+    "description": "Tall ladder for painting ceilings.",
+    "status": "approved",
+    "submittedAt": "2023-10-04T00:00:00Z"
+  }
+]

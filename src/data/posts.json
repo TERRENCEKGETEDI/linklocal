@@ -1,0 +1,36 @@
+[
+  {
+    "id": "1",
+    "userId": "2",
+    "title": "House Cleaning Service",
+    "description": "Professional cleaning services for homes and offices.",
+    "category": "cleaning",
+    "price": 20,
+    "priceUnit": "per hour",
+    "location": "New York",
+    "availability": "Weekdays 9am-5pm",
+    "rating": 4.5,
+    "likes": 10,
+    "favorites": ["3"],
+    "reports": [],
+    "deleted": false,
+    "createdAt": "2023-10-01T00:00:00Z"
+  },
+  {
+    "id": "2",
+    "userId": "3",
+    "title": "Plumbing Repair",
+    "description": "Fix leaks, install pipes, and more.",
+    "category": "repair",
+    "price": 50,
+    "priceUnit": "per job",
+    "location": "Los Angeles",
+    "availability": "24/7",
+    "rating": 4.8,
+    "likes": 25,
+    "favorites": [],
+    "reports": [],
+    "deleted": false,
+    "createdAt": "2023-10-02T00:00:00Z"
+  }
+]
