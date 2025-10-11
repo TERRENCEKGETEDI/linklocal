@@ -34,7 +34,7 @@ export const AuthProvider = ({ children }) => {
   const register = async (email, password, name) => {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     // Add to our data
-    addUser({ email, name, role: 'user', blocked: false, badges: [], points: 0 });
+    addUser({ uid: userCredential.user.uid, email, name, role: 'user', blocked: false, badges: [], points: 0 });
     return userCredential;
   };
 

@@ -12,10 +12,24 @@ const Schedule = () => {
   return (
     <Container maxWidth="md" sx={{ mt: 8, mb: 8 }}>
       <Box textAlign="center" sx={{ mb: 4 }}>
-        <Typography variant="h3" component="h1" gutterBottom sx={{ color: '#FF6F00' }}>
+        <Typography
+          variant="h3"
+          component="h1"
+          gutterBottom
+          sx={{
+            color: '#FF6F00',
+            fontSize: { xs: '1.8rem', sm: '2.2rem', md: '2.5rem' }
+          }}
+        >
           Event Schedule
         </Typography>
-        <Typography variant="h6" component="p">
+        <Typography
+          variant="h6"
+          component="p"
+          sx={{
+            fontSize: { xs: '1rem', sm: '1.2rem', md: '1.4rem' }
+          }}
+        >
           Stay updated with upcoming events and activities.
         </Typography>
       </Box>

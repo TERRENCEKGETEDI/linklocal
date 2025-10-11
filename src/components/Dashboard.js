@@ -15,6 +15,7 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
+  const [showFavorites, setShowFavorites] = useState(false);
   const [openPostDialog, setOpenPostDialog] = useState(false);
   const [openToolDialog, setOpenToolDialog] = useState(false);
   const [editingPost, setEditingPost] = useState(null);
@@ -62,8 +63,11 @@ const Dashboard = () => {
     if (selectedCategory) {
       filtered = filtered.filter(p => p.category === selectedCategory);
     }
+    if (showFavorites) {
+      filtered = filtered.filter(p => p.favorites.includes(currentUser.uid));
+    }
     setFilteredPosts(filtered);
-  }, [searchTerm, selectedCategory, posts]);
+  }, [searchTerm, selectedCategory, posts, showFavorites, currentUser.uid]);
 
   const handlePostSubmit = async () => {
     try {
@@ -71,7 +75,7 @@ const Dashboard = () => {
         await updatePost(editingPost.id, postForm);
         toast.success('Post updated!');
       } else {
-        await addPost({ ...postForm, userId: currentUser.uid, rating: 0, likes: 0, favorites: [], reports: [] });
+        await addPost({ ...postForm, userId: currentUser.uid, rating: 0, likes: [], favorites: [], reports: [] });
         toast.success('Post created!');
       }
       // Reload posts
@@ -117,8 +121,10 @@ const Dashboard = () => {
   const handleLike = async (postId) => {
     try {
       const post = posts.find(p => p.id === postId);
-      const isLiked = post.likes > 0; // Simplified
-      await updatePost(postId, { likes: isLiked ? post.likes - 1 : post.likes + 1 });
+      const likesArray = Array.isArray(post.likes) ? post.likes : [];
+      const isLiked = likesArray.includes(currentUser.uid);
+      const newLikes = isLiked ? likesArray.filter(id => id !== currentUser.uid) : [...likesArray, currentUser.uid];
+      await updatePost(postId, { likes: newLikes });
       const allPosts = await getPosts();
       const activePosts = allPosts.filter(p => !p.deleted);
       setPosts(activePosts);
@@ -194,7 +200,16 @@ const Dashboard = () => {
   return (
     <Container maxWidth="lg" sx={{ backgroundColor: '#FAFAFA', minHeight: '100vh', py: 4 }}>
       <Box sx={{ mb: 4, textAlign: 'center' }}>
-        <Typography variant="h4" component="h1" gutterBottom sx={{ color: '#FF6F00', fontWeight: 'bold' }}>
+        <Typography
+          variant="h4"
+          component="h1"
+          gutterBottom
+          sx={{
+            color: '#FF6F00',
+            fontWeight: 'bold',
+            fontSize: { xs: '1.5rem', sm: '2rem', md: '2.125rem' }
+          }}
+        >
           Service Platform Dashboard
         </Typography>
         <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, flexWrap: 'wrap' }}>
@@ -231,6 +246,7 @@ const Dashboard = () => {
             {categories.map(cat => <MenuItem key={cat} value={cat}>{cat}</MenuItem>)}
           </Select>
         </FormControl>
+        <Button variant={showFavorites ? "outlined" : "contained"} sx={{ backgroundColor: showFavorites ? 'transparent' : '#FF6F00', borderColor: '#FF6F00', color: showFavorites ? '#FF6F00' : 'white', '&:hover': { backgroundColor: showFavorites ? '#FFF3E0' : '#E65100' } }} onClick={() => setShowFavorites(!showFavorites)}>My Favorites</Button>
         <Button variant="contained" sx={{ backgroundColor: '#FF6F00', '&:hover': { backgroundColor: '#E65100' } }} onClick={() => setOpenPostDialog(true)}>Post Service</Button>
         <Button variant="contained" sx={{ backgroundColor: '#FF6F00', '&:hover': { backgroundColor: '#E65100' } }} onClick={() => window.location.href = '/request-service'}>Request Service</Button>
         <Button variant="contained" sx={{ backgroundColor: '#FF6F00', '&:hover': { backgroundColor: '#E65100' } }} onClick={() => window.location.href = '/service-requests'}>View Requests</Button>
@@ -257,12 +273,12 @@ const Dashboard = () => {
                 <CardContent sx={{ backgroundColor: '#FFF3E0' }}>
                   <Typography variant="h6" sx={{ color: '#FF6F00', fontWeight: 'bold' }}>{post.title}</Typography>
                   <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>{post.description}</Typography>
-                  <Typography sx={{ fontWeight: 'bold' }}>Price: ${post.price} {post.priceUnit}</Typography>
+                  <Typography sx={{ fontWeight: 'bold' }}>Price: R{post.price} {post.priceUnit}</Typography>
                   <Typography>Location: {post.location}</Typography>
                   <Typography>Rating: {post.rating} stars</Typography>
                 </CardContent>
                 <CardActions sx={{ justifyContent: 'space-between' }}>
-                  <Button size="small" sx={{ color: '#FF6F00' }} onClick={() => handleLike(post.id)}>Like ({post.likes})</Button>
+                  <Button size="small" sx={{ color: '#FF6F00' }} onClick={() => handleLike(post.id)}>Like ({Array.isArray(post.likes) ? post.likes.length : post.likes})</Button>
                   <Button size="small" sx={{ color: '#FF6F00' }} onClick={() => handleFavorite(post.id)}>Favorite</Button>
                   <Button size="small" sx={{ color: '#4CAF50' }} onClick={() => handleRequest(post)}>Request</Button>
                   <Button size="small" color="error" onClick={() => handleReport(post.id)}>Report</Button>

@@ -11,8 +11,11 @@ const ServiceRequests = () => {
   const [offers, setOffers] = useState([]);
   const [users, setUsers] = useState([]);
   const [openOfferDialog, setOpenOfferDialog] = useState(false);
+  const [openRatingDialog, setOpenRatingDialog] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState(null);
+  const [selectedOffer, setSelectedOffer] = useState(null);
   const [offerForm, setOfferForm] = useState({ message: '', price: '' });
+  const [ratingForm, setRatingForm] = useState({ rating: 0, review: '' });
 
   useEffect(() => {
     const loadData = async () => {
@@ -106,9 +109,47 @@ const ServiceRequests = () => {
     }
   };
 
+  const handleMarkCompleted = async (offerId) => {
+    try {
+      await updateOffer(offerId, { status: 'completed' });
+      toast.success('Service marked as completed!');
+      // Reload offers
+      const allOffers = await getOffers();
+      setOffers(allOffers);
+    } catch (error) {
+      toast.error('Failed to mark as completed');
+      console.error('Error marking as completed:', error);
+    }
+  };
+
+  const handleRatingSubmit = async () => {
+    try {
+      await updateOffer(selectedOffer, { rating: ratingForm.rating, review: ratingForm.review });
+      toast.success('Rating submitted!');
+      setOpenRatingDialog(false);
+      setRatingForm({ rating: 0, review: '' });
+      // Reload offers
+      const allOffers = await getOffers();
+      setOffers(allOffers);
+    } catch (error) {
+      toast.error('Failed to submit rating');
+      console.error('Error submitting rating:', error);
+    }
+  };
+
   return (
     <Container maxWidth="lg" sx={{ backgroundColor: '#FAFAFA', minHeight: '100vh', py: 4 }}>
-      <Typography variant="h4" component="h1" gutterBottom sx={{ color: '#FF6F00', fontWeight: 'bold', textAlign: 'center' }}>
+      <Typography
+        variant="h4"
+        component="h1"
+        gutterBottom
+        sx={{
+          color: '#FF6F00',
+          fontWeight: 'bold',
+          textAlign: 'center',
+          fontSize: { xs: '1.5rem', sm: '2rem', md: '2.125rem' }
+        }}
+      >
         Service Requests
       </Typography>
       <Grid container spacing={3}>
@@ -128,7 +169,7 @@ const ServiceRequests = () => {
                   </Typography>
                   <Typography>Description: {request.description}</Typography>
                   <Typography>Location: {request.location}</Typography>
-                  <Typography>Budget: ${request.budget}</Typography>
+                  <Typography>Budget: R{request.budget}</Typography>
                   <Typography>Status: {request.status}</Typography>
                   {requestOffers.length > 0 && (
                     <Box sx={{ mt: 2 }}>
@@ -141,10 +182,23 @@ const ServiceRequests = () => {
                             <Typography>Message: {offer.message}</Typography>
                             <Typography>Price: ${offer.price}</Typography>
                             <Typography>Status: {offer.status}</Typography>
+                            {offer.rating && (
+                              <Typography>Rating: {offer.rating}/5 {offer.review && `- ${offer.review}`}</Typography>
+                            )}
                             {request.userId === currentUser.uid && offer.status === 'pending' && (
                               <Box sx={{ mt: 1 }}>
                                 <Button size="small" color="primary" onClick={() => handleAcceptOffer(offer.id)}>Accept</Button>
                                 <Button size="small" color="error" onClick={() => handleRejectOffer(offer.id)}>Reject</Button>
+                              </Box>
+                            )}
+                            {request.userId === currentUser.uid && offer.status === 'accepted' && (
+                              <Box sx={{ mt: 1 }}>
+                                <Button size="small" color="secondary" onClick={() => handleMarkCompleted(offer.id)}>Mark as Completed</Button>
+                              </Box>
+                            )}
+                            {request.userId === currentUser.uid && offer.status === 'completed' && !offer.rating && (
+                              <Box sx={{ mt: 1 }}>
+                                <Button size="small" color="primary" onClick={() => { setSelectedOffer(offer.id); setOpenRatingDialog(true); }}>Rate Service</Button>
                               </Box>
                             )}
                           </Box>
@@ -176,6 +230,19 @@ const ServiceRequests = () => {
         <DialogActions>
           <Button onClick={() => setOpenOfferDialog(false)}>Cancel</Button>
           <Button sx={{ backgroundColor: '#FF6F00', '&:hover': { backgroundColor: '#E65100' } }} variant="contained" onClick={handleOfferSubmit}>Submit Offer</Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Rating Dialog */}
+      <Dialog open={openRatingDialog} onClose={() => setOpenRatingDialog(false)}>
+        <DialogTitle sx={{ color: '#FF6F00' }}>Rate the Service</DialogTitle>
+        <DialogContent>
+          <TextField fullWidth margin="normal" label="Rating (1-5)" type="number" inputProps={{ min: 1, max: 5 }} value={ratingForm.rating} onChange={(e) => setRatingForm({...ratingForm, rating: parseInt(e.target.value)})} />
+          <TextField fullWidth margin="normal" label="Review (optional)" multiline rows={3} value={ratingForm.review} onChange={(e) => setRatingForm({...ratingForm, review: e.target.value})} />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenRatingDialog(false)}>Cancel</Button>
+          <Button sx={{ backgroundColor: '#FF6F00', '&:hover': { backgroundColor: '#E65100' } }} variant="contained" onClick={handleRatingSubmit}>Submit Rating</Button>
         </DialogActions>
       </Dialog>
     </Container>

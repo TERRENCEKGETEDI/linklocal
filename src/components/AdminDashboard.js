@@ -193,7 +193,7 @@ const AdminDashboard = () => {
       {/* Users Management */}
       <Typography variant="h5" gutterBottom>Users</Typography>
       <Button variant="contained" sx={{ mb: 2 }} onClick={() => setOpenUserDialog(true)}>Add User</Button>
-      <TableContainer component={Paper} sx={{ mb: 4 }}>
+      <TableContainer component={Paper} sx={{ mb: 4, borderRadius: '20px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)' }}>
         <Table>
           <TableHead>
             <TableRow>
@@ -230,7 +230,7 @@ const AdminDashboard = () => {
 
       {/* Posts Management */}
       <Typography variant="h5" gutterBottom>Posts</Typography>
-      <TableContainer component={Paper} sx={{ mb: 4 }}>
+      <TableContainer component={Paper} sx={{ mb: 4, borderRadius: '20px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)' }}>
         <Table>
           <TableHead>
             <TableRow>
@@ -244,7 +244,7 @@ const AdminDashboard = () => {
             {filteredPosts.map(post => (
               <TableRow key={post.id}>
                 <TableCell>{post.title}</TableCell>
-                <TableCell>{users.find(u => u.id === post.userId)?.name}</TableCell>
+                <TableCell>{users.find(u => u.uid === post.userId || u.email === post.userId)?.name}</TableCell>
                 <TableCell>{post.deleted ? 'Yes' : 'No'}</TableCell>
                 <TableCell>
                   <Button size="small" color="error" onClick={() => handleDeletePost(post.id)}>Delete</Button>
@@ -258,7 +258,7 @@ const AdminDashboard = () => {
 
       {/* Tool Requests */}
       <Typography variant="h5" gutterBottom>Tool Requests</Typography>
-      <TableContainer component={Paper}>
+      <TableContainer component={Paper} sx={{ borderRadius: '20px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)' }}>
         <Table>
           <TableHead>
             <TableRow>
@@ -272,7 +272,7 @@ const AdminDashboard = () => {
             {filteredRequests.map(request => (
               <TableRow key={request.id}>
                 <TableCell>{request.toolName}</TableCell>
-                <TableCell>{users.find(u => u.id === request.userId)?.name}</TableCell>
+                <TableCell>{users.find(u => u.uid === request.userId || u.email === request.userId)?.name}</TableCell>
                 <TableCell>{request.status}</TableCell>
                 <TableCell>
                   {request.status === 'pending' && (

@@ -143,7 +143,7 @@ describe('Dashboard Component', () => {
         availability: '',
         userId: 'user123',
         rating: 0,
-        likes: 0,
+        likes: [],
         favorites: [],
         reports: [],
       });
